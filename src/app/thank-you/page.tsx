@@ -123,7 +123,7 @@ const ThankYouPage = async ({
                         className='flex space-x-6 py-6'>
                         <div className='relative h-24 w-24'>
                           {typeof image !== 'string' &&
-                          image.url ? (
+                            image.url ? (
                             <Image
                               fill
                               src={image.url}

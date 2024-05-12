@@ -95,7 +95,7 @@ const Page = () => {
                       <div className='flex-shrink-0'>
                         <div className='relative h-24 w-24'>
                           {typeof image !== 'string' &&
-                          image.url ? (
+                            image.url ? (
                             <Image
                               fill
                               src={image.url}

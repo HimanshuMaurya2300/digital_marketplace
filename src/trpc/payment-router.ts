@@ -8,6 +8,9 @@ import { TRPCError } from '@trpc/server'
 import { getPayloadClient } from '../get-payload'
 import { stripe } from '../lib/stripe'
 import type Stripe from 'stripe'
+import { Resend } from 'resend'
+import { ReceiptEmailHtml } from '@/components/emails/ReceiptEmail'
+import { Product } from '@/payload-types'
 
 export const paymentRouter = router({
   createSession: privateProcedure
@@ -38,14 +41,13 @@ export const paymentRouter = router({
       const order = await payload.create({
         collection: 'orders',
         data: {
-          _isPaid: false,
+          _isPaid: true,
           products: filteredProducts.map((prod) => prod.id),
           user: user.id,
         },
       })
 
-      const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] =
-        []
+      const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
       filteredProducts.forEach((product) => {
         line_items.push({
@@ -55,7 +57,7 @@ export const paymentRouter = router({
       })
 
       line_items.push({
-        price: 'price_1OCeBwA19umTXGu8s4p2G3aX',
+        price: "price_1PFEdCSEocSGLT1A4xddG5zY",
         quantity: 1,
         adjustable_quantity: {
           enabled: false,
@@ -63,24 +65,24 @@ export const paymentRouter = router({
       })
 
       try {
-        const stripeSession =
-          await stripe.checkout.sessions.create({
-            success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${order.id}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart`,
-            payment_method_types: ['card', 'paypal'],
-            mode: 'payment',
-            metadata: {
-              userId: user.id,
-              orderId: order.id,
-            },
-            line_items,
-          })
+        const stripeSession = await stripe.checkout.sessions.create({
+          success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${order.id}`,
+          cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart`,
+          payment_method_types: ['card'],
+          mode: 'payment',
+          metadata: {
+            userId: user.id,
+            orderId: order.id,
+          },
+          line_items,
+        })
 
         return { url: stripeSession.url }
       } catch (err) {
         return { url: null }
       }
     }),
+
   pollOrderStatus: privateProcedure
     .input(z.object({ orderId: z.string() }))
     .query(async ({ input }) => {
@@ -102,6 +104,21 @@ export const paymentRouter = router({
       }
 
       const [order] = orders
+
+      // const resend = new Resend(process.env.RESEND_API_KEY || '')
+
+      // resend.emails.send({
+      //   from: 'onboarding@resend.dev',
+      //   to: 'mauryah380@gmail.com',
+      //   subject:
+      //     'Thanks for your order! This is your receipt.',
+      //   html: ReceiptEmailHtml({
+      //     date: new Date(),
+      //     email: 'mauryah380@gmail.com',
+      //     orderId: order.id,
+      //     products: order.products as Product[],
+      //   }),
+      // })
 
       return { isPaid: order._isPaid }
     }),
