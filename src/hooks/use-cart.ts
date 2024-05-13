@@ -25,11 +25,15 @@ export const useCart = create<CartState>()(
           return { items: [...state.items, { product }] }
         }),
       removeItem: (id) =>
-        set((state) => ({
-          items: state.items.filter(
-            (item) => item.product.id !== id
-          ),
-        })),
+        set((state) => {
+          const itemIndex = state.items.findIndex((item) => item.product.id === id)
+          if (itemIndex !== -1) {
+            const updatedItems = [...state.items]
+            updatedItems.splice(itemIndex, 1)
+            return { items: updatedItems }
+          }
+          return state
+        }),
       clearCart: () => set({ items: [] }),
     }),
     {

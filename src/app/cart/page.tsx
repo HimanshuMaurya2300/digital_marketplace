@@ -12,14 +12,17 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 const Page = () => {
-  const { items, removeItem } = useCart()
+  const { items, removeItem, clearCart } = useCart()
 
   const router = useRouter()
 
   const { mutate: createCheckoutSession, isLoading } =
     trpc.payment.createSession.useMutation({
       onSuccess: ({ url }) => {
-        if (url) router.push(url)
+        if (url) {
+          clearCart()
+          router.push(url)
+        }
       },
     })
 
@@ -210,9 +213,10 @@ const Page = () => {
             <div className='mt-6'>
               <Button
                 disabled={items.length === 0 || isLoading}
-                onClick={() =>
+                onClick={() => {
                   createCheckoutSession({ productIds })
-                }
+                  // clearCart()
+                }}
                 className='w-full'
                 size='lg'>
                 {isLoading ? (

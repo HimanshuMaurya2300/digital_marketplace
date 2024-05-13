@@ -8,9 +8,9 @@ import { TRPCError } from '@trpc/server'
 import { getPayloadClient } from '../get-payload'
 import { stripe } from '../lib/stripe'
 import type Stripe from 'stripe'
-import { Resend } from 'resend'
-import { ReceiptEmailHtml } from '@/components/emails/ReceiptEmail'
 import { Product } from '@/payload-types'
+import nodemailer from 'nodemailer'
+import { ReceiptEmailHtml } from '../components/emails/ReceiptEmail'
 
 export const paymentRouter = router({
   createSession: privateProcedure
@@ -57,14 +57,50 @@ export const paymentRouter = router({
       })
 
       line_items.push({
-        price: "price_1PFEdCSEocSGLT1A4xddG5zY",
+        price: "price_1PFic1SEocSGLT1A8Dy5Pg12",
         quantity: 1,
         adjustable_quantity: {
           enabled: false,
         },
       })
 
+      console.log(line_items)
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.email",
+        port: 587,
+        secure: false, // Use `true` for port 465, `false` for all other ports
+        auth: {
+          user: "2130108@sliet.ac.in",
+          pass: "qyiz pxuz bepb ttln",
+        },
+      });
+
+
+      async function sendEmail() {
+
+        const htmlContent = ReceiptEmailHtml({
+          date: new Date(),
+          email: user.email,
+          orderId: order.id,
+          products: order.products as Product[],
+        });
+
+        // send mail with defined transport object
+        const info = await transporter.sendMail({
+          from: '2130108@sliet.ac.in', // sender address
+          to: "mauryah380@gmail.com", // list of receivers
+          subject: "Hello ✔", // Subject line
+          html: htmlContent, // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+      }
+
       try {
+        await sendEmail()
+
         const stripeSession = await stripe.checkout.sessions.create({
           success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${order.id}`,
           cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart`,
@@ -104,21 +140,6 @@ export const paymentRouter = router({
       }
 
       const [order] = orders
-
-      // const resend = new Resend(process.env.RESEND_API_KEY || '')
-
-      // resend.emails.send({
-      //   from: 'onboarding@resend.dev',
-      //   to: 'mauryah380@gmail.com',
-      //   subject:
-      //     'Thanks for your order! This is your receipt.',
-      //   html: ReceiptEmailHtml({
-      //     date: new Date(),
-      //     email: 'mauryah380@gmail.com',
-      //     orderId: order.id,
-      //     products: order.products as Product[],
-      //   }),
-      // })
 
       return { isPaid: order._isPaid }
     }),

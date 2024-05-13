@@ -52,31 +52,31 @@ const syncUser: AfterChangeHook<Product> = async ({
 
 const isAdminOrHasAccess =
   (): Access =>
-  ({ req: { user: _user } }) => {
-    const user = _user as User | undefined
+    ({ req: { user: _user } }) => {
+      const user = _user as User | undefined
 
-    if (!user) return false
-    if (user.role === 'admin') return true
+      if (!user) return false
+      if (user.role === 'admin') return true
 
-    const userProductIDs = (user.products || []).reduce<
-      Array<string>
-    >((acc, product) => {
-      if (!product) return acc
-      if (typeof product === 'string') {
-        acc.push(product)
-      } else {
-        acc.push(product.id)
+      const userProductIDs = (user.products || []).reduce<
+        Array<string>
+      >((acc, product) => {
+        if (!product) return acc
+        if (typeof product === 'string') {
+          acc.push(product)
+        } else {
+          acc.push(product.id)
+        }
+
+        return acc
+      }, [])
+
+      return {
+        id: {
+          in: userProductIDs,
+        },
       }
-
-      return acc
-    }, [])
-
-    return {
-      id: {
-        in: userProductIDs,
-      },
     }
-  }
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -96,14 +96,13 @@ export const Products: CollectionConfig = {
         if (args.operation === 'create') {
           const data = args.data as Product
 
-          const createdProduct =
-            await stripe.products.create({
-              name: data.name,
-              default_price_data: {
-                currency: 'USD',
-                unit_amount: Math.round(data.price * 100),
-              },
-            })
+          const createdProduct = await stripe.products.create({
+            name: data.name,
+            default_price_data: {
+              currency: 'INR',
+              unit_amount: Math.round(data.price * 100),
+            },
+          })
 
           const updated: Product = {
             ...data,
@@ -156,7 +155,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'price',
-      label: 'Price in USD',
+      label: 'Price in ₹',
       min: 0,
       max: 1000,
       type: 'number',
