@@ -88,8 +88,6 @@ const Footer = () => {
               </Link>
             </div>
           </div>
-
-          <button className='absolute right-0 px-5'>Click</button>
         </div>
       </MaxWidthWrapper>
     </footer>

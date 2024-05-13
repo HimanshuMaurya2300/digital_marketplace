@@ -73,7 +73,7 @@ export const paymentRouter = router({
         secure: false, // Use `true` for port 465, `false` for all other ports
         auth: {
           user: "2130108@sliet.ac.in",
-          pass: "qyiz pxuz bepb ttln",
+          pass: process.env.PASSWORD,
         },
       });
 
