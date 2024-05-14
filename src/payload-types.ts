@@ -41,6 +41,7 @@ export interface Product {
   user?: (string | null) | User;
   name: string;
   description?: string | null;
+  previewLink: string;
   price: number;
   category: 'ui_kits' | 'icons';
   product_files: string | ProductFile;
@@ -120,14 +121,14 @@ export interface PayloadPreference {
   };
   key?: string | null;
   value?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  | {
+    [k: string]: unknown;
+  }
+  | unknown[]
+  | string
+  | number
+  | boolean
+  | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -141,5 +142,5 @@ export interface PayloadMigration {
 
 
 declare module 'payload' {
-  export interface GeneratedTypes extends Config {}
+  export interface GeneratedTypes extends Config { }
 }

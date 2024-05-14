@@ -154,6 +154,12 @@ export const Products: CollectionConfig = {
       label: 'Product details',
     },
     {
+      name: 'previewLink',
+      label: 'Preview Link',
+      type: 'text',
+      required: false,
+    },
+    {
       name: 'price',
       label: 'Price in ₹',
       min: 0,

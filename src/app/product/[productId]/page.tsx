@@ -1,6 +1,7 @@
 import AddToCartButton from '@/components/AddToCartButton'
 import ImageSlider from '@/components/ImageSlider'
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import PreviewLink from '@/components/PreviewLink'
 import ProductReel from '@/components/ProductReel'
 import { PRODUCT_CATEGORIES } from '@/config'
 import { getPayloadClient } from '@/get-payload'
@@ -104,14 +105,23 @@ const Page = async ({ params }: PageProps) => {
                 </p>
               </div>
 
-              <div className='mt-6 flex items-center'>
-                <Check
-                  aria-hidden='true'
-                  className='h-5 w-5 flex-shrink-0 text-green-500'
-                />
-                <p className='ml-2 text-sm text-muted-foreground'>
-                  Eligible for instant delivery
-                </p>
+              <div className='mt-6 flex items-center justify-between'>
+                <div className='flex items-center'>
+                  <Check
+                    aria-hidden='true'
+                    className='h-5 w-5 flex-shrink-0 text-green-500'
+                  />
+                  <p className='ml-2 text-sm text-muted-foreground'>
+                    Eligible for instant delivery
+                  </p>
+                </div>
+                {
+                  product.previewLink && (
+                    <div>
+                      <PreviewLink link={product.previewLink} />
+                    </div>
+                  )
+                }
               </div>
             </section>
           </div>
@@ -124,7 +134,7 @@ const Page = async ({ params }: PageProps) => {
           </div>
 
           {/* add to cart part */}
-          <div className='mt-10 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start'>
+          <div className='lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start'>
             <div>
               <div className='mt-10'>
                 <AddToCartButton product={product} />
